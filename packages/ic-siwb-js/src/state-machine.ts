@@ -5,28 +5,26 @@ import {
   Ed25519KeyIdentity,
 } from '@dfinity/identity';
 import { assign, emit, fromPromise, setup } from 'xstate';
+
 import type {
   _SERVICE as SIWB_IDENTITY_SERVICE,
   SignMessageType as SignMessageRawType,
 } from './declarations/ic_siwb_provider.did';
 import { createDelegationChain } from './delegation';
-
 import {
   callGetDelegation,
   callLogin,
   callPrepareLogin,
 } from './siwb-provider';
+import { SiwbStorage } from './storage';
 import {
   AddressType,
-  type BitcoinProviderMaker,
   getAddressType,
   getRegisterExtension,
-  type IWalletProvider,
   type NetworkItem,
   type SupportedProvider,
   type WalletProviderKey,
 } from './wallet';
-import { SiwbStorage } from './storage';
 
 export type State =
   | 'initializing'
@@ -44,7 +42,7 @@ export type Context = {
   address?: string;
   publicKey?: string;
   connected: boolean;
-  provider?: IWalletProvider | BitcoinProviderMaker;
+  provider?: SupportedProvider;
   network?: NetworkItem;
   anonymousActor?: ActorSubclass<SIWB_IDENTITY_SERVICE>;
   identity?: DelegationIdentity;
@@ -86,7 +84,7 @@ export type SingatureSettledEvent = {
     signMessageType: SignMessageRawType;
   };
 };
-export type ErrorEvent<T = any> = {
+export type ErrorEvent<T = unknown> = {
   type: 'ERROR';
   data: T;
 };

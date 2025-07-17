@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
 import type { EventEmitter } from 'stream';
+
+import { MEBitcoinProvider } from './me';
 
 export type SignMessageType = 'ecdsa' | 'bip322-simple';
 
@@ -10,6 +11,7 @@ export type WalletProviderKey =
   | 'unisat'
   | 'atom'
   | 'XverseProviders.BitcoinProvider'
+  | 'magicEden.bitcoin'
   | 'okxwallet.bitcoinTestnet'
   | 'okxwallet.bitcoin'
   | 'okxwallet.bitcoinSignet'
@@ -252,7 +254,10 @@ export interface IWalletProvider {
   ): this;
 }
 
-export type SupportedProvider = BitcoinProviderMaker | IWalletProvider;
+export type SupportedProvider =
+  | BitcoinProviderMaker
+  | IWalletProvider
+  | MEBitcoinProvider;
 
 export interface NetworkItem {
   type: string;
@@ -295,6 +300,9 @@ export const getWalletProvider = (key: WalletProviderKey) => {
     case 'XverseProviders.BitcoinProvider':
     case 'OrangecryptoProviders.BitcoinProvider': {
       return BitcoinProviderMaker.createProvider(key);
+    }
+    case 'magicEden.bitcoin': {
+      return new MEBitcoinProvider();
     }
     default: {
       const provider = getPropByKey(window as any, key);
